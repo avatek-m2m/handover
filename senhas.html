@@ -9,7 +9,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #e2e8f0; }
-        
         .vault-card { 
             background: #0f172a; 
             border: 1px solid #1e293b; 
@@ -19,15 +18,13 @@
         .vault-card:hover { 
             border-color: #ef4444; 
             transform: translateY(-5px);
-            box-shadow: 0 20px 30px -10px rgba(239, 68, 68, 0.15); 
+            box-shadow: 0 20px 30px -10px rgba(239, 68, 68, 0.2); 
         }
-
         .glass-header { 
             background: rgba(2, 6, 23, 0.85); 
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
         }
-
         .logo-vault {
             background: white;
             padding: 6px;
@@ -39,11 +36,6 @@
             justify-content: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-
-        .pass-input {
-            letter-spacing: 0.15em;
-            font-family: 'Courier New', Courier, monospace;
-        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -51,23 +43,20 @@
     <header class="sticky top-0 z-50 glass-header border-b border-slate-800 py-6 px-6">
         <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4 text-left w-full md:w-auto">
-                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all active:scale-95">
+                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all">
                     <i class="fas fa-chevron-left text-slate-400"></i>
                 </a>
                 <div>
-                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic italic">Safe <span class="text-red-500 font-black">Vault</span></h1>
-                    <div class="flex flex-col">
-                        <p class="text-red-500 text-[9px] font-bold tracking-widest uppercase italic flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-                            Restricted Access Hub
-                        </p>
-                    </div>
+                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic">Safe <span class="text-red-500">Vault</span></h1>
+                    <p class="text-red-500 text-[9px] font-bold tracking-widest uppercase italic flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                        Restricted Access Hub
+                    </p>
                 </div>
             </div>
-            
             <div class="relative w-full md:w-80">
-                <input type="text" id="searchInput" placeholder="Buscar serviço ou categoria..." 
-                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-red-500 outline-none transition-all text-white placeholder-slate-600">
+                <input type="text" id="searchInput" placeholder="Filtrar credenciais..." 
+                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-red-500 outline-none text-white transition-all">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-600"></i>
             </div>
         </div>
@@ -76,9 +65,8 @@
     <main class="max-w-5xl mx-auto px-6 py-12">
         <div id="loader" class="text-center py-32">
             <div class="animate-spin inline-block w-8 h-8 border-[3px] border-red-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic animate-pulse">Descriptografando credenciais...</p>
+            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic animate-pulse tracking-widest">Sincronizando Cofre...</p>
         </div>
-
         <div id="vaultGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
     </main>
 
@@ -99,49 +87,58 @@
                         const keys = Object.keys(item);
                         for (let a of aliases) {
                             const found = keys.find(k => k.toLowerCase().replace(/_/g, '').includes(a.toLowerCase()));
-                            if (found && item[found] !== undefined) return item[found];
+                            if (found && item[found] !== undefined && item[found] !== null) return item[found];
                         }
                         return '';
                     };
 
-                    const servico   = getVal(['servico', 'nome']) || 'Serviço';
-                    const usuario   = getVal(['usuario', 'login', 'email_login']) || 'N/A';
-                    const senha     = getVal(['senha', 'password']) || '';
+                    const servico   = getVal(['servico', 'nome', 'ferramenta']) || 'Acesso';
+                    const usuario   = getVal(['usuario', 'login', 'user', 'email']) || '---';
+                    const senha     = getVal(['senha', 'password', 'pass']) || '';
                     const link      = getVal(['link', 'url', 'site']) || '#';
-                    const logoRaw   = getVal(['logo', 'dominio']) || '';
+                    
+                    // Lógica reforçada de captura e limpeza do domínio do Logo
+                    let rawLogo = getVal(['logo', 'dominio', 'url_logo']) || '';
+                    let dominio = rawLogo.toString().toLowerCase()
+                        .replace(/^(https?:\/\/)?(www\.)?/, '')
+                        .split('/')[0]
+                        .split('?')[0]
+                        .trim();
 
-                    // Limpeza de URL para o logo
-                    let dominio = logoRaw.toString().toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0].trim();
-                    if(!dominio) dominio = `${servico.toLowerCase().replace(/\s+/g, '')}.com`;
+                    // Se a coluna "Logo" estiver vazia, tenta usar o nome do serviço
+                    if(!dominio || dominio === "") {
+                        dominio = `${servico.toLowerCase().replace(/\s+/g, '')}.com`;
+                    }
 
                     const logoUrl = `https://img.logo.dev/${dominio}?token=${LOGO_TOKEN}`;
                     const fallbackUrl = `https://ui-avatars.com/api/?name=${servico}&background=1e293b&color=ef4444&bold=true`;
 
                     grid.innerHTML += `
-                        <div class="vault-card p-6 flex flex-col md:flex-row items-center gap-6" data-search="${servico.toLowerCase()}">
+                        <div class="vault-card p-6 flex flex-col md:flex-row items-center gap-6" data-search="${servico.toLowerCase()} ${usuario.toLowerCase()}">
                             <div class="logo-vault shrink-0">
-                                <img src="${logoUrl}" alt="${servico}" class="max-w-full max-h-full object-contain" onerror="this.src='${fallbackUrl}'">
+                                <img src="${logoUrl}" alt="${servico}" class="max-w-full max-h-full object-contain" 
+                                     onerror="this.onerror=null; this.src='${fallbackUrl}';">
                             </div>
                             
                             <div class="flex-1 w-full min-w-0">
                                 <div class="flex justify-between items-start mb-1">
-                                    <h2 class="text-xl font-bold text-white truncate">${servico}</h2>
+                                    <h2 class="text-xl font-bold text-white truncate uppercase tracking-tight">${servico}</h2>
                                     <a href="${link}" target="_blank" class="text-slate-600 hover:text-green-500 transition-colors">
                                         <i class="fas fa-external-link-alt text-xs"></i>
                                     </a>
                                 </div>
-                                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-widest mb-4">User: <span class="text-slate-300 italic">@${usuario}</span></p>
+                                <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-4">Login: <span class="text-slate-300 italic">${usuario}</span></p>
                                 
-                                <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800 shadow-inner">
+                                <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
                                     <input type="password" value="${senha}" readonly id="pass-${index}" 
-                                           class="bg-transparent border-none text-sm text-red-500/80 font-mono w-full focus:outline-none pass-input">
+                                           class="bg-transparent border-none text-sm text-red-500/80 font-mono w-full focus:outline-none tracking-widest">
                                     
                                     <div class="flex gap-1 border-l border-slate-800 pl-2">
-                                        <button onclick="toggleView(${index})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white transition-colors" title="Visualizar">
-                                            <i class="fas fa-eye text-xs" id="icon-${index}"></i>
+                                        <button onclick="toggleView(${index})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white" title="Ver">
+                                            <i class="fas fa-eye text-[10px]" id="icon-${index}"></i>
                                         </button>
-                                        <button onclick="copyPass('pass-${index}')" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-blue-400 transition-colors" title="Copiar">
-                                            <i class="fas fa-copy text-xs"></i>
+                                        <button onclick="copyPass('pass-${index}')" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-blue-400" title="Copiar">
+                                            <i class="fas fa-copy text-[10px]"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -157,7 +154,7 @@
                 });
             } catch (error) {
                 console.error(error);
-                document.getElementById('loader').innerHTML = '<p class="text-red-500">Erro crítico ao acessar o cofre.</p>';
+                document.getElementById('loader').innerHTML = '<p class="text-red-500">Erro ao carregar cofre.</p>';
             }
         }
 
@@ -181,10 +178,9 @@
             document.execCommand("copy");
             input.type = originalType;
             
-            // Feedback visual simples
             const btn = window.event.currentTarget;
             const originalIcon = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check text-green-500 text-xs"></i>';
+            btn.innerHTML = '<i class="fas fa-check text-green-500 text-[10px]"></i>';
             setTimeout(() => { btn.innerHTML = originalIcon; }, 1500);
         }
 
