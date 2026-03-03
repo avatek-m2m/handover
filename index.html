@@ -8,37 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #020617;
-        }
-        
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
         .card-fatura { 
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #0f172a; 
+            border: 1px solid #1e293b; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
-        
-        .card-fatura:hover {
-            border-color: #3b82f6;
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2);
+        .card-fatura:hover { 
+            border-color: #3b82f6; 
+            transform: translateY(-5px); 
+            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2); 
         }
-
-        .glass-header {
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+        .glass-header { 
+            background: rgba(2, 6, 23, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
         }
-
-        .logo-container {
-            background: white;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        .logo-container { 
+            background: white; 
+            padding: 6px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); 
         }
     </style>
 </head>
@@ -48,18 +40,21 @@
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4 text-left w-full md:w-auto">
                 <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/40">
-                    <i class="fas fa-exchange-alt text-white text-xl"></i>
+                    <i class="fas fa-sync-alt text-white text-xl"></i>
                 </div>
                 <div>
                     <h1 class="text-2xl font-black text-white tracking-tighter uppercase italic">
                         Handover <span class="text-blue-500">Ops</span>
                     </h1>
-                    <p class="text-slate-500 text-[10px] font-bold tracking-widest uppercase italic">Data Driven Transition</p>
+                    <div class="flex flex-col">
+                        <p class="text-green-500 text-[9px] font-bold tracking-widest uppercase italic">● Live Sync with Google API</p>
+                        <p class="text-slate-500 text-[9px] font-bold tracking-widest uppercase italic leading-none mt-1">Data Driven Transition</p>
+                    </div>
                 </div>
             </div>
             
             <div class="relative w-full md:w-80">
-                <input type="text" id="searchInput" placeholder="Filtrar por ferramenta ou dono..." 
+                <input type="text" id="searchInput" placeholder="Filtrar ferramenta ou dono..." 
                        class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-600"></i>
             </div>
@@ -69,9 +64,8 @@
     <main class="max-w-6xl mx-auto px-6 py-12">
         <div id="loader" class="text-center py-32">
             <div class="animate-spin inline-block w-10 h-10 border-[3px] border-blue-500 border-t-transparent rounded-full"></div>
-            <p class="text-slate-500 mt-4 font-medium animate-pulse">Sincronizando faturas...</p>
+            <p class="text-slate-500 mt-4 font-medium italic">Sincronizando dados...</p>
         </div>
-
         <div id="faturasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </main>
 
@@ -83,7 +77,6 @@
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
-                
                 const grid = document.getElementById('faturasGrid');
                 document.getElementById('loader').classList.add('hidden');
                 grid.innerHTML = '';
@@ -104,14 +97,19 @@
                     const metodo      = getVal(['metodo', 'pagamento']) || 'A Definir';
                     const link        = getVal(['link', 'url', 'site']) || '#';
                     
-                    // Pega o domínio da coluna "Logo". Se estiver vazia, usa o nome da ferramenta + .com
-                    let dominio = getVal(['logo', 'dominio']) || `${ferramenta.toLowerCase().replace(/\s+/g, '')}.com`;
+                    // LIMPEZA DA URL PARA O LOGO.DEV
+                    let rawLogo = getVal(['logo', 'dominio']) || '';
+                    let dominio = rawLogo.toString()
+                        .replace(/^(https?:\/\/)?(www\.)?/, '') // Remove http, https e www
+                        .split('/')[0] // Pega só o que vem antes da primeira barra
+                        .trim();
+
+                    if (!dominio) dominio = `${ferramenta.toLowerCase().replace(/\s+/g, '')}.com`;
                     
-                    // URL Seguindo o seu padrão solicitado
-                    const logoUrl = `https://img.logo.dev/${dominio.trim()}?token=${LOGO_TOKEN}`;
+                    const logoUrl = `https://img.logo.dev/${dominio}?token=${LOGO_TOKEN}`;
                     const fallbackUrl = `https://ui-avatars.com/api/?name=${ferramenta}&background=1e293b&color=3b82f6&bold=true`;
 
-                    const card = `
+                    grid.innerHTML += `
                         <div class="card-fatura p-6 rounded-[2rem] flex flex-col justify-between" data-search="${ferramenta.toLowerCase()} ${responsavel.toLowerCase()}">
                             <div>
                                 <div class="flex justify-between items-start mb-8">
@@ -120,58 +118,41 @@
                                             <span class="text-[9px] uppercase font-black opacity-70">Dia</span>
                                             <span class="text-2xl font-black">${dia}</span>
                                         </div>
-                                        
                                         <div class="w-14 h-14 logo-container rounded-2xl border border-slate-700 overflow-hidden">
-                                            <img src="${logoUrl}" 
-                                                 alt="${ferramenta}" 
-                                                 class="max-w-full max-h-full object-contain"
-                                                 onerror="this.onerror=null; this.src='${fallbackUrl}';">
+                                            <img src="${logoUrl}" alt="${ferramenta}" class="max-w-full max-h-full object-contain" onerror="this.src='${fallbackUrl}'">
                                         </div>
                                     </div>
-                                    
                                     <div class="text-right">
                                         <span class="block text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1">Dono</span>
-                                        <span class="inline-block bg-blue-500/10 text-blue-400 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-500/20 italic">
-                                            @${responsavel}
-                                        </span>
+                                        <span class="inline-block bg-blue-500/10 text-blue-400 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-500/20 italic">@${responsavel}</span>
                                     </div>
                                 </div>
-                                
                                 <h2 class="text-2xl font-bold text-white mb-2 tracking-tight">${ferramenta}</h2>
-                                
                                 <div class="flex items-center gap-3 mb-8 bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
-                                    <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-blue-500 border border-slate-700">
-                                        <i class="fas fa-credit-card text-xs"></i>
-                                    </div>
+                                    <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-blue-500 border border-slate-700 italic font-black text-[10px]">$$</div>
                                     <div>
                                         <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 leading-none">Pagamento</p>
-                                        <p class="text-xs text-slate-200 font-bold uppercase tracking-tighter italic">${metodo}</p>
+                                        <p class="text-sm text-slate-200 font-bold uppercase tracking-tighter italic">${metodo}</p>
                                     </div>
                                 </div>
                             </div>
-
-                            <a href="${link}" target="_blank" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl text-[10px] font-black transition-all shadow-lg shadow-blue-600/20 uppercase tracking-[0.2em] active:scale-95 border-b-4 border-blue-800">
+                            <a href="${link}" target="_blank" class="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl text-[10px] font-black transition-all shadow-lg uppercase tracking-[0.2em] active:scale-95 border-b-4 border-blue-800">
                                 <i class="fas fa-external-link-alt mr-2"></i> Abrir Portal
                             </a>
-                        </div>
-                    `;
-                    grid.innerHTML += card;
+                        </div>`;
                 });
 
                 document.getElementById('searchInput').addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase();
                     document.querySelectorAll('.card-fatura').forEach(card => {
-                        const content = card.getAttribute('data-search');
-                        card.style.display = content.includes(term) ? 'flex' : 'none';
+                        card.style.display = card.getAttribute('data-search').includes(term) ? 'flex' : 'none';
                     });
                 });
-
             } catch (error) {
-                console.error('Erro:', error);
-                document.getElementById('loader').innerHTML = '<p class="text-red-500">Erro ao carregar faturas.</p>';
+                console.error(error);
+                document.getElementById('loader').innerHTML = '<p class="text-red-500">Erro na API.</p>';
             }
         }
-
         fetchFaturas();
     </script>
 </body>
