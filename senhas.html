@@ -6,9 +6,11 @@
     <title>Handover Ops | Safe Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1055/1055683.png" type="image/x-icon">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #e2e8f0; }
+        
         .vault-card { 
             background: #0f172a; 
             border: 1px solid #1e293b; 
@@ -20,21 +22,44 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 30px -10px rgba(239, 68, 68, 0.2); 
         }
+
         .glass-header { 
             background: rgba(2, 6, 23, 0.85); 
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
         }
+
         .logo-vault {
             background: white;
             padding: 6px;
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .pass-input {
+            letter-spacing: 0.15em;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Badge de Categoria */
+        .badge-cat {
+            font-size: 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-style: italic;
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -43,20 +68,23 @@
     <header class="sticky top-0 z-50 glass-header border-b border-slate-800 py-6 px-6">
         <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4 text-left w-full md:w-auto">
-                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all">
+                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all active:scale-95">
                     <i class="fas fa-chevron-left text-slate-400"></i>
                 </a>
                 <div>
-                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic">Safe <span class="text-red-500">Vault</span></h1>
-                    <p class="text-red-500 text-[9px] font-bold tracking-widest uppercase italic flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-                        Restricted Access Hub
-                    </p>
+                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic">Safe <span class="text-red-500 font-black">Vault</span></h1>
+                    <div class="flex flex-col">
+                        <p class="text-red-500 text-[9px] font-bold tracking-widest uppercase italic flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                            Restricted Access Hub
+                        </p>
+                    </div>
                 </div>
             </div>
+            
             <div class="relative w-full md:w-80">
-                <input type="text" id="searchInput" placeholder="Filtrar credenciais..." 
-                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-red-500 outline-none text-white transition-all">
+                <input type="text" id="searchInput" placeholder="Filtrar por serviço, user ou categoria..." 
+                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-red-500 outline-none transition-all text-white placeholder-slate-600">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-600"></i>
             </div>
         </div>
@@ -65,8 +93,9 @@
     <main class="max-w-5xl mx-auto px-6 py-12">
         <div id="loader" class="text-center py-32">
             <div class="animate-spin inline-block w-8 h-8 border-[3px] border-red-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic animate-pulse tracking-widest">Sincronizando Cofre...</p>
+            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic animate-pulse">Sincronizando Cofre Blindado...</p>
         </div>
+
         <div id="vaultGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
     </main>
 
@@ -96,25 +125,22 @@
                     const usuario   = getVal(['usuario', 'login', 'user', 'email']) || '---';
                     const senha     = getVal(['senha', 'password', 'pass']) || '';
                     const link      = getVal(['link', 'url', 'site']) || '#';
+                    const categoria = getVal(['categoria', 'tipo', 'setor']) || 'Geral';
                     
-                    // Lógica reforçada de captura e limpeza do domínio do Logo
-                    let rawLogo = getVal(['logo', 'dominio', 'url_logo']) || '';
+                    // Limpeza de URL para o logo
+                    let rawLogo = getVal(['logo', 'dominio']) || '';
                     let dominio = rawLogo.toString().toLowerCase()
                         .replace(/^(https?:\/\/)?(www\.)?/, '')
                         .split('/')[0]
-                        .split('?')[0]
                         .trim();
 
-                    // Se a coluna "Logo" estiver vazia, tenta usar o nome do serviço
-                    if(!dominio || dominio === "") {
-                        dominio = `${servico.toLowerCase().replace(/\s+/g, '')}.com`;
-                    }
+                    if(!dominio) dominio = `${servico.toLowerCase().replace(/\s+/g, '')}.com`;
 
                     const logoUrl = `https://img.logo.dev/${dominio}?token=${LOGO_TOKEN}`;
                     const fallbackUrl = `https://ui-avatars.com/api/?name=${servico}&background=1e293b&color=ef4444&bold=true`;
 
                     grid.innerHTML += `
-                        <div class="vault-card p-6 flex flex-col md:flex-row items-center gap-6" data-search="${servico.toLowerCase()} ${usuario.toLowerCase()}">
+                        <div class="vault-card p-6 flex flex-col md:flex-row items-center gap-6" data-search="${servico.toLowerCase()} ${usuario.toLowerCase()} ${categoria.toLowerCase()}">
                             <div class="logo-vault shrink-0">
                                 <img src="${logoUrl}" alt="${servico}" class="max-w-full max-h-full object-contain" 
                                      onerror="this.onerror=null; this.src='${fallbackUrl}';">
@@ -122,19 +148,22 @@
                             
                             <div class="flex-1 w-full min-w-0">
                                 <div class="flex justify-between items-start mb-1">
-                                    <h2 class="text-xl font-bold text-white truncate uppercase tracking-tight">${servico}</h2>
-                                    <a href="${link}" target="_blank" class="text-slate-600 hover:text-green-500 transition-colors">
+                                    <div>
+                                        <span class="badge-cat">${categoria}</span>
+                                        <h2 class="text-xl font-bold text-white truncate uppercase tracking-tight leading-none">${servico}</h2>
+                                    </div>
+                                    <a href="${link}" target="_blank" class="text-slate-600 hover:text-green-500 transition-colors mt-2">
                                         <i class="fas fa-external-link-alt text-xs"></i>
                                     </a>
                                 </div>
                                 <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-4">Login: <span class="text-slate-300 italic">${usuario}</span></p>
                                 
-                                <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                                <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800 shadow-inner">
                                     <input type="password" value="${senha}" readonly id="pass-${index}" 
-                                           class="bg-transparent border-none text-sm text-red-500/80 font-mono w-full focus:outline-none tracking-widest">
+                                           class="bg-transparent border-none text-sm text-red-500/80 font-mono w-full focus:outline-none pass-input">
                                     
                                     <div class="flex gap-1 border-l border-slate-800 pl-2">
-                                        <button onclick="toggleView(${index})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white" title="Ver">
+                                        <button onclick="toggleView(${index})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white" title="Visualizar">
                                             <i class="fas fa-eye text-[10px]" id="icon-${index}"></i>
                                         </button>
                                         <button onclick="copyPass('pass-${index}')" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-blue-400" title="Copiar">
@@ -149,12 +178,13 @@
                 document.getElementById('searchInput').addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase();
                     document.querySelectorAll('.vault-card').forEach(card => {
-                        card.style.display = card.getAttribute('data-search').includes(term) ? 'flex' : 'none';
+                        const content = card.getAttribute('data-search');
+                        card.style.display = content.includes(term) ? 'flex' : 'none';
                     });
                 });
             } catch (error) {
                 console.error(error);
-                document.getElementById('loader').innerHTML = '<p class="text-red-500">Erro ao carregar cofre.</p>';
+                document.getElementById('loader').innerHTML = '<p class="text-red-500 font-bold uppercase tracking-widest text-xs italic">Erro crítico de descriptografia.</p>';
             }
         }
 
