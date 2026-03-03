@@ -16,7 +16,7 @@
         }
         .action-card:hover { border-color: #818cf8; transform: translateX(5px); }
         .glass-header { background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-        .status-badge { font-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border; }
+        .status-badge { font-size: 8px; font-weight: 900; uppercase tracking-widest px-3 py-1 rounded-full border; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -36,7 +36,7 @@
             </div>
             <div class="relative w-full md:w-80">
                 <input type="text" id="searchInput" placeholder="Buscar projeto ou cliente..." 
-                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-white">
+                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-white transition-all">
                 <i class="fas fa-filter absolute left-4 top-3.5 text-slate-600"></i>
             </div>
         </div>
@@ -45,6 +45,7 @@
     <main class="max-w-4xl mx-auto px-6 py-12">
         <div id="loader" class="text-center py-20">
             <div class="animate-spin inline-block w-8 h-8 border-[3px] border-indigo-500 border-t-transparent rounded-full mb-4"></div>
+            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic animate-pulse">Carregando Histórico...</p>
         </div>
 
         <div id="actionList" class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-800 before:to-transparent">
@@ -52,7 +53,6 @@
     </main>
 
     <script>
-        // ATENÇÃO: Substitua pela URL da nova API das Ações
         const API_URL = 'https://script.google.com/macros/s/AKfycbyte2iplSMCg9Kc4W0Qp5Qqw8kEP6mJI2jaZ6ojxC1Fy-Gbxp9aYmW9-C-H-nXi_nQJ/exec'; 
 
         async function fetchActions() {
@@ -64,47 +64,64 @@
                 container.innerHTML = '';
 
                 data.forEach((item, index) => {
-                    const titulo     = item.titulo || item.Titulo || 'Sem Título';
-                    const dataAcao   = item.data || item.Data || '';
-                    const descricao  = item.descricao || item.Descricao || '';
-                    const tipo       = (item.tipo || item.Tipo || 'Ação').toUpperCase();
-                    const status     = (item.status || item.Status || 'Pendente').toUpperCase();
-                    const prioridade = (item.prioridade || item.Prioridade || 'Normal').toUpperCase();
+                    const getVal = (aliases) => {
+                        const keys = Object.keys(item);
+                        for (let a of aliases) {
+                            const found = keys.find(k => k.toLowerCase().replace(/_/g, '').includes(a.toLowerCase()));
+                            if (found && item[found] !== undefined && item[found] !== null) return item[found].toString();
+                        }
+                        return '';
+                    };
+
+                    const titulo     = getVal(['titulo', 'nome']) || 'Sem Título';
+                    const dataAcao   = getVal(['data', 'periodo']) || '';
+                    const descricao  = getVal(['descricao', 'info', 'detalhes']) || '';
+                    const tipo       = getVal(['tipo', 'categoria']) || 'Ação';
+                    const status     = getVal(['status', 'fase']) || 'Pendente';
+                    const prioridade = getVal(['prioridade', 'urgencia']) || 'Normal';
 
                     // Cores por Status
-                    const statusClass = status.includes('CONCLU') ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
-                                       status.includes('ANDAM') ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
+                    const s = status.toUpperCase();
+                    const statusClass = s.includes('CONCLU') ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
+                                       s.includes('ANDAM') ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
                                        'bg-slate-500/10 text-slate-400 border-slate-500/20';
 
-                    container.innerHTML += `
-                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active py-4" data-search="${titulo.toLowerCase()} ${descricao.toLowerCase()}">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-700 bg-slate-900 text-indigo-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                <i class="fas fa-circle text-[8px]"></i>
+                    // Criação segura do elemento
+                    const itemWrapper = document.createElement('div');
+                    itemWrapper.className = "relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-4 action-item";
+                    itemWrapper.setAttribute('data-search', `${titulo.toLowerCase()} ${descricao.toLowerCase()}`);
+
+                    itemWrapper.innerHTML = `
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-700 bg-slate-900 text-indigo-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                            <i class="fas fa-circle text-[6px]"></i>
+                        </div>
+                        <div class="w-[calc(100%-4rem)] md:w-[45%] action-card p-6 shadow-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[9px] font-black text-indigo-400 tracking-[0.2em] uppercase italic">${dataAcao}</span>
+                                <span class="status-badge ${statusClass}">${status.toUpperCase()}</span>
                             </div>
-                            <div class="w-[calc(100%-4rem)] md:w-[45%] action-card p-6 shadow-xl">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[9px] font-black text-indigo-400 tracking-[0.2em]">${dataAcao}</span>
-                                    <span class="status-badge text-[8px] ${statusClass}">${status}</span>
-                                </div>
-                                <h3 class="text-lg font-bold text-white mb-2 uppercase tracking-tight">${titulo}</h3>
-                                <p class="text-sm text-slate-400 leading-relaxed mb-4">${descricao}</p>
-                                <div class="flex items-center gap-3 border-t border-slate-800 pt-4">
-                                    <span class="text-[8px] bg-slate-800 px-2 py-1 rounded text-slate-500 font-bold uppercase">${tipo}</span>
-                                    ${prioridade.includes('ALTA') ? '<span class="text-[8px] text-red-500 font-black uppercase italic tracking-widest">!!! Prioridade Máxima</span>' : ''}
-                                </div>
+                            <h3 class="text-lg font-bold text-white mb-2 uppercase tracking-tight italic">${titulo}</h3>
+                            <p class="text-sm text-slate-400 leading-relaxed mb-4 whitespace-pre-wrap" id="desc-${index}"></p>
+                            <div class="flex items-center gap-3 border-t border-slate-800 pt-4">
+                                <span class="text-[8px] bg-slate-800 px-2 py-1 rounded text-slate-500 font-bold uppercase tracking-widest">${tipo}</span>
+                                ${prioridade.toUpperCase().includes('ALTA') ? '<span class="text-[8px] text-red-500 font-black uppercase italic tracking-widest">!!! Prioridade</span>' : ''}
                             </div>
                         </div>`;
+
+                    container.appendChild(itemWrapper);
+                    // Inserção segura de texto para evitar quebra por caracteres como < ou >
+                    document.getElementById(`desc-${index}`).textContent = descricao;
                 });
 
                 document.getElementById('searchInput').addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase();
-                    document.querySelectorAll('.relative.flex').forEach(item => {
-                        const content = item.getAttribute('data-search');
-                        item.style.display = content.includes(term) ? 'flex' : 'none';
+                    document.querySelectorAll('.action-item').forEach(item => {
+                        item.style.display = item.getAttribute('data-search').includes(term) ? 'flex' : 'none';
                     });
                 });
             } catch (error) {
                 console.error(error);
+                document.getElementById('loader').innerHTML = '<p class="text-red-500 text-xs italic">Erro ao carregar log de ações.</p>';
             }
         }
         fetchActions();
