@@ -8,18 +8,68 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #020617; }
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #e2e8f0; }
         
-        .contact-card { 
+        .company-section { 
             background: #0f172a; 
             border: 1px solid #1e293b; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border-radius: 2.5rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
-        
-        .contact-card:hover { 
-            border-color: #3b82f6; 
-            transform: translateY(-5px); 
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.15); 
+
+        .company-header {
+            background: rgba(30, 41, 59, 0.3);
+            border-bottom: 1px solid #1e293b;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo-frame { 
+            background: white; 
+            padding: 4px; 
+            width: 64px;
+            height: 64px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .person-row {
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .person-row:last-child { border-bottom: none; }
+        .person-row:hover { background: rgba(59, 130, 246, 0.03); }
+
+        .btn-action {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #94a3b8;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
         }
 
         .glass-header { 
@@ -27,70 +77,44 @@
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px); 
         }
-
-        .logo-frame { 
-            background: white; 
-            padding: 5px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .btn-contact {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(255,255,255,0.03);
-            transition: all 0.2s;
-        }
-
-        .btn-contact:hover {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: rgba(59, 130, 246, 0.3);
-            transform: translateX(3px);
-        }
     </style>
 </head>
-<body class="text-slate-200 min-h-screen">
+<body class="min-h-screen">
 
     <header class="sticky top-0 z-50 glass-header border-b border-slate-800 py-6 px-6">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4 text-left w-full md:w-auto">
-                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all active:scale-90">
+                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all active:scale-95">
                     <i class="fas fa-chevron-left text-slate-400"></i>
                 </a>
                 <div>
-                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic">
-                        Network <span class="text-blue-500 font-black">Hub</span>
-                    </h1>
+                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic">Network <span class="text-blue-500">Hub</span></h1>
                     <div class="flex flex-col">
                         <p class="text-green-500 text-[9px] font-bold tracking-widest uppercase italic flex items-center gap-1">
                             <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                             Live Sync with Google API
                         </p>
-                        <p class="text-slate-500 text-[9px] font-bold tracking-widest uppercase italic leading-none mt-1 pl-2.5">Data Driven Transition</p>
                     </div>
                 </div>
             </div>
-            
             <div class="relative w-full md:w-80">
-                <input type="text" id="searchInput" placeholder="Filtrar por empresa, nome ou setor..." 
-                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white placeholder-slate-600">
+                <input type="text" id="searchInput" placeholder="Buscar empresa ou pessoa..." 
+                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-white transition-all">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-600"></i>
             </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-6 py-12">
+    <main class="max-w-5xl mx-auto px-6 py-12">
         <div id="loader" class="text-center py-32">
-            <div class="animate-spin inline-block w-10 h-10 border-[3px] border-blue-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-slate-500 font-medium italic tracking-widest text-[10px] uppercase">Mapeando Stakeholders...</p>
+            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-blue-500 border-t-transparent rounded-full mb-4"></div>
+            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic">Sincronizando Diretório...</p>
         </div>
 
-        <div id="contactsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        <div id="directory"></div>
     </main>
 
     <script>
-        // --- CONFIGURAÇÕES DO USUÁRIO ---
         const API_URL = 'https://script.google.com/macros/s/AKfycbxhPpNT5pxpe__PeJXW7MtsFOzX1Cag-ZZYG0_MIkXpWA-U699yvzn4YTT4sHaPBybS4Q/exec'; 
         const LOGO_TOKEN = 'pk_FGnHpYa7RVyBaPNWay1WYg';
 
@@ -99,109 +123,112 @@
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                const grid = document.getElementById('contactsGrid');
+                const directory = document.getElementById('directory');
                 document.getElementById('loader').classList.add('hidden');
-                grid.innerHTML = '';
+                directory.innerHTML = '';
 
-                data.forEach(item => {
-                    // Função inteligente para buscar campos independente da formatação da planilha
+                // AGRUPAMENTO LÓGICO POR EMPRESA
+                const grouped = data.reduce((acc, item) => {
                     const getVal = (aliases) => {
                         const keys = Object.keys(item);
                         for (let a of aliases) {
                             const found = keys.find(k => k.toLowerCase().replace(/_/g, '').includes(a.toLowerCase()));
-                            if (found && item[found] !== undefined) return item[found];
+                            if (found && item[found]) return item[found];
                         }
                         return '';
                     };
 
-                    const empresa   = getVal(['empresa']) || 'N/A';
-                    const nome      = getVal(['nome', 'pessoa']) || 'N/A';
-                    const funcao    = getVal(['funcao', 'cargo']) || 'Colaborador';
-                    const setor     = getVal(['setor', 'departamento']) || 'Geral';
-                    const email     = getVal(['email']) || '';
-                    const whatsapp  = getVal(['whatsapp', 'whats']).toString().replace(/\D/g, '');
-                    const telefone  = getVal(['telefone', 'tel']) || '';
+                    const empresa = getVal(['empresa']) || 'Outros';
+                    if (!acc[empresa]) acc[empresa] = { logoRaw: getVal(['logo', 'dominio']), pessoas: [] };
                     
-                    // Tratamento rigoroso da URL do Logo
-                    let rawLogo = getVal(['logo', 'dominio', 'url']) || '';
-                    let dominio = rawLogo.toString()
+                    acc[empresa].pessoas.push({
+                        nome: getVal(['nome', 'pessoa']) || 'N/A',
+                        funcao: getVal(['funcao', 'cargo']) || 'Colaborador',
+                        setor: getVal(['setor']) || 'Geral',
+                        email: getVal(['email']),
+                        whatsapp: getVal(['whatsapp', 'whats']).toString().replace(/\D/g, ''),
+                        telefone: getVal(['telefone'])
+                    });
+                    return acc;
+                }, {});
+
+                for (const [empresa, content] of Object.entries(grouped)) {
+                    // Tratamento do Logo
+                    let dominio = content.logoRaw.toString()
                         .toLowerCase()
                         .replace(/^(https?:\/\/)?(www\.)?/, '')
                         .split('/')[0]
                         .trim();
 
-                    // Fallback para domínio se a coluna estiver vazia
-                    if (!dominio) {
-                        dominio = `${empresa.toLowerCase().replace(/\s+/g, '')}.com`;
-                    }
-
+                    if(!dominio) dominio = `${empresa.toLowerCase().replace(/\s+/g, '')}.com`;
+                    
                     const logoUrl = `https://img.logo.dev/${dominio}?token=${LOGO_TOKEN}`;
                     const fallbackUrl = `https://ui-avatars.com/api/?name=${empresa}&background=1e293b&color=3b82f6&bold=true`;
 
-                    grid.innerHTML += `
-                        <div class="contact-card p-6 rounded-[2.5rem] flex flex-col justify-between relative overflow-hidden" data-search="${empresa.toLowerCase()} ${nome.toLowerCase()} ${setor.toLowerCase()}">
-                            <div>
-                                <div class="flex items-center gap-4 mb-8">
-                                    <div class="w-16 h-16 logo-frame rounded-2xl border border-slate-700 overflow-hidden">
-                                        <img src="${logoUrl}" alt="${empresa}" 
-                                             class="max-w-full max-h-full object-contain" 
-                                             onerror="this.onerror=null; this.src='${fallbackUrl}'">
-                                    </div>
-                                    <div>
-                                        <h2 class="text-xl font-black text-white leading-tight uppercase tracking-tighter italic">${empresa}</h2>
-                                        <span class="bg-blue-500/10 text-blue-400 text-[9px] font-black px-3 py-1 rounded-full border border-blue-500/20 uppercase tracking-widest">
-                                            ${setor}
-                                        </span>
-                                    </div>
+                    let sectionHTML = `
+                        <section class="company-section shadow-2xl shadow-black/50" data-search="${empresa.toLowerCase()}">
+                            <div class="company-header">
+                                <div class="logo-frame">
+                                    <img src="${logoUrl}" alt="${empresa}" class="max-w-full max-h-full object-contain" onerror="this.src='${fallbackUrl}'">
                                 </div>
-
-                                <div class="mb-10 px-1">
-                                    <p class="text-2xl font-bold text-slate-100 tracking-tight">${nome}</p>
-                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1 italic">${funcao}</p>
+                                <div>
+                                    <h2 class="text-xl font-black text-white italic uppercase tracking-tighter leading-none mb-1">${empresa}</h2>
+                                    <p class="text-[9px] text-blue-500 font-bold tracking-[0.2em] uppercase opacity-80">${content.pessoas.length} Contato(s)</p>
                                 </div>
                             </div>
+                            <div class="company-body">
+                    `;
 
-                            <div class="grid grid-cols-1 gap-2">
-                                ${email ? `
-                                <a href="mailto:${email}" class="btn-contact flex items-center justify-between p-4 rounded-2xl text-xs font-bold transition-all group">
-                                    <span class="flex items-center gap-3 italic"><i class="fas fa-envelope text-blue-500"></i> ${email}</span>
-                                    <i class="fas fa-chevron-right opacity-20 group-hover:opacity-100 transition-opacity"></i>
-                                </a>` : ''}
-
-                                ${whatsapp ? `
-                                <a href="https://wa.me/${whatsapp}" target="_blank" class="btn-contact flex items-center justify-between p-4 rounded-2xl text-xs font-bold transition-all group">
-                                    <span class="flex items-center gap-3 italic"><i class="fab fa-whatsapp text-green-500 text-lg"></i> Iniciar Conversa</span>
-                                    <i class="fas fa-chevron-right opacity-20 group-hover:opacity-100 transition-opacity"></i>
-                                </a>` : ''}
-
-                                ${telefone && !whatsapp ? `
-                                <a href="tel:${telefone}" class="btn-contact flex items-center justify-between p-4 rounded-2xl text-xs font-bold transition-all group">
-                                    <span class="flex items-center gap-3 italic"><i class="fas fa-phone text-slate-400"></i> ${telefone}</span>
-                                    <i class="fas fa-chevron-right opacity-20 group-hover:opacity-100 transition-opacity"></i>
-                                </a>` : ''}
+                    content.pessoas.forEach(p => {
+                        sectionHTML += `
+                            <div class="person-row" data-search-person="${p.nome.toLowerCase()}">
+                                <div>
+                                    <p class="text-base font-bold text-slate-200 tracking-tight leading-none mb-1">${p.nome}</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[9px] text-blue-400 font-black uppercase italic tracking-widest">${p.setor}</span>
+                                        <span class="text-slate-700 text-[10px]">•</span>
+                                        <span class="text-[9px] text-slate-500 font-medium uppercase italic">${p.funcao}</span>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    ${p.email ? `<a href="mailto:${p.email}" title="Enviar E-mail" class="btn-action"><i class="fas fa-envelope text-xs"></i></a>` : ''}
+                                    ${p.whatsapp ? `<a href="https://wa.me/${p.whatsapp}" target="_blank" title="WhatsApp" class="btn-action"><i class="fab fa-whatsapp text-sm"></i></a>` : ''}
+                                    ${p.telefone && !p.whatsapp ? `<a href="tel:${p.telefone}" title="Ligar" class="btn-action"><i class="fas fa-phone text-xs"></i></a>` : ''}
+                                </div>
                             </div>
-                        </div>`;
-                });
+                        `;
+                    });
 
-                // Lógica de Busca em Tempo Real
+                    sectionHTML += `</div></section>`;
+                    directory.innerHTML += sectionHTML;
+                }
+
+                // BUSCA EM TEMPO REAL
                 document.getElementById('searchInput').addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase();
-                    document.querySelectorAll('.contact-card').forEach(card => {
-                        const content = card.getAttribute('data-search');
-                        card.style.display = content.includes(term) ? 'flex' : 'none';
+                    document.querySelectorAll('.company-section').forEach(section => {
+                        const companyName = section.getAttribute('data-search');
+                        const persons = section.querySelectorAll('.person-row');
+                        let hasVisiblePerson = false;
+
+                        persons.forEach(row => {
+                            const personName = row.getAttribute('data-search-person');
+                            if (personName.includes(term) || companyName.includes(term)) {
+                                row.style.display = 'grid';
+                                hasVisiblePerson = true;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                        section.style.display = hasVisiblePerson ? 'block' : 'none';
                     });
                 });
 
             } catch (error) {
-                console.error("Erro na busca de contatos:", error);
-                document.getElementById('loader').innerHTML = `
-                    <div class="bg-red-500/10 border border-red-500/20 p-6 rounded-3xl text-red-500 inline-block">
-                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
-                        <p class="font-bold uppercase tracking-widest text-xs">Erro na Conexão API</p>
-                    </div>`;
+                console.error(error);
+                document.getElementById('loader').innerHTML = '<p class="text-red-500 italic">Erro ao carregar diretório de contatos.</p>';
             }
         }
-
         fetchContacts();
     </script>
 </body>
