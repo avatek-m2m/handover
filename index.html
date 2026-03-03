@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handover Ops | Centro de Comando</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
+        
+        .nav-card { 
+            background: #0f172a; 
+            border: 1px solid #1e293b; 
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        
+        .nav-card:hover { 
+            border-color: #3b82f6; 
+            transform: translateY(-8px); 
+            box-shadow: 0 30px 40px -10px rgba(59, 130, 246, 0.25); 
+        }
+
+        .glass-bg { 
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent);
+        }
+
+        .icon-box {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen flex flex-col justify-center items-center relative overflow-hidden">
+    
+    <div class="absolute inset-0 glass-bg pointer-events-none"></div>
+
+    <header class="text-center mb-16 relative z-10 px-6">
+        <div class="w-20 h-20 bg-blue-600 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-blue-900/40 mx-auto mb-6 rotate-6">
+            <i class="fas fa-rocket text-white text-3xl -rotate-6"></i>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
+            Handover <span class="text-blue-500 underline decoration-4 underline-offset-8">Ops</span>
+        </h1>
+        <div class="flex flex-col items-center mt-6">
+            <p class="text-green-500 text-xs font-bold tracking-[0.3em] uppercase italic flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                System Operational
+            </p>
+            <p class="text-slate-500 text-[10px] font-bold tracking-[0.4em] uppercase italic mt-2">Data Driven Transition Framework</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl w-full px-6 grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+        
+        <a href="contas.html" class="nav-card p-10 rounded-[2.5rem] flex flex-col items-center text-center group">
+            <div class="w-16 h-16 icon-box rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                <i class="fas fa-file-invoice-dollar text-blue-500 text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight italic">Contas</h2>
+            <p class="text-slate-500 text-xs leading-relaxed font-medium">Controle de faturas, renovações anuais e métodos de pagamento.</p>
+            <div class="mt-8 text-blue-500 text-sm font-black tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
+                Acessar <i class="fas fa-arrow-right ml-2"></i>
+            </div>
+        </a>
+
+        <a href="contatos.html" class="nav-card p-10 rounded-[2.5rem] flex flex-col items-center text-center group">
+            <div class="w-16 h-16 icon-box rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                <i class="fas fa-address-book text-blue-500 text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight italic">Contatos</h2>
+            <p class="text-slate-500 text-xs leading-relaxed font-medium">Stakeholders, fornecedores e canais críticos de emergência.</p>
+            <div class="mt-8 text-blue-500 text-sm font-black tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
+                Acessar <i class="fas fa-arrow-right ml-2"></i>
+            </div>
+        </a>
+
+        <a href="#" class="nav-card p-10 rounded-[2.5rem] flex flex-col items-center text-center group border-dashed border-slate-700">
+            <div class="w-16 h-16 icon-box rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                <i class="fas fa-key text-slate-400 text-2xl group-hover:text-blue-500 transition-colors"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white mb-2 uppercase tracking-tight italic opacity-60">Senhas</h2>
+            <p class="text-slate-500 text-xs leading-relaxed font-medium italic">Configuração de acesso seguro em desenvolvimento.</p>
+            <div class="mt-8 text-slate-600 text-[10px] font-black tracking-widest uppercase">
+                Aguardando Protocolo
+            </div>
+        </a>
+
+    </main>
+
+    <footer class="mt-20 text-slate-600 text-[9px] font-bold tracking-[0.5em] uppercase italic">
+        Legacy Handover Protocol v1.0
+    </footer>
+
+</body>
+</html>
