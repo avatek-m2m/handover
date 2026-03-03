@@ -12,54 +12,21 @@
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #e2e8f0; }
         
         .vault-card { 
-            background: #0f172a; 
-            border: 1px solid #1e293b; 
-            border-radius: 2rem;
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 2rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .vault-card:hover { 
-            border-color: #ef4444; 
-            transform: translateY(-5px);
+            border-color: #ef4444; transform: translateY(-5px);
             box-shadow: 0 20px 30px -10px rgba(239, 68, 68, 0.2); 
         }
-
-        .glass-header { 
-            background: rgba(2, 6, 23, 0.85); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-        .logo-vault {
-            background: white;
-            padding: 6px;
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
+        .glass-header { background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .logo-vault { background: white; padding: 6px; width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .badge-cat { font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; font-style: italic; background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+        
+        /* Força a exibição correta de caracteres especiais no input */
         .pass-input {
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
             font-family: 'Courier New', Courier, monospace;
-        }
-
-        /* Badge de Categoria */
-        .badge-cat {
-            font-size: 8px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            font-style: italic;
-            background: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            padding: 2px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -68,23 +35,19 @@
     <header class="sticky top-0 z-50 glass-header border-b border-slate-800 py-6 px-6">
         <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4 text-left w-full md:w-auto">
-                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all active:scale-95">
+                <a href="index.html" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all">
                     <i class="fas fa-chevron-left text-slate-400"></i>
                 </a>
                 <div>
-                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic">Safe <span class="text-red-500 font-black">Vault</span></h1>
-                    <div class="flex flex-col">
-                        <p class="text-red-500 text-[9px] font-bold tracking-widest uppercase italic flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-                            Restricted Access Hub
-                        </p>
-                    </div>
+                    <h1 class="text-xl font-black text-white tracking-tighter uppercase italic italic text-red-500">Safe Vault</h1>
+                    <p class="text-slate-500 text-[9px] font-bold tracking-widest uppercase italic flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> Restricted Access Hub
+                    </p>
                 </div>
             </div>
-            
             <div class="relative w-full md:w-80">
-                <input type="text" id="searchInput" placeholder="Filtrar por serviço, user ou categoria..." 
-                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-red-500 outline-none transition-all text-white placeholder-slate-600">
+                <input type="text" id="searchInput" placeholder="Filtrar por serviço, login ou categoria..." 
+                       class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm focus:ring-2 focus:ring-red-500 outline-none text-white transition-all">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-600"></i>
             </div>
         </div>
@@ -93,9 +56,8 @@
     <main class="max-w-5xl mx-auto px-6 py-12">
         <div id="loader" class="text-center py-32">
             <div class="animate-spin inline-block w-8 h-8 border-[3px] border-red-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic animate-pulse">Sincronizando Cofre Blindado...</p>
+            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest italic animate-pulse">Descriptografando cofres...</p>
         </div>
-
         <div id="vaultGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
     </main>
 
@@ -116,98 +78,100 @@
                         const keys = Object.keys(item);
                         for (let a of aliases) {
                             const found = keys.find(k => k.toLowerCase().replace(/_/g, '').includes(a.toLowerCase()));
-                            if (found && item[found] !== undefined && item[found] !== null) return item[found];
+                            if (found && item[found] !== undefined && item[found] !== null) {
+                                return item[found].toString();
+                            }
                         }
                         return '';
                     };
 
-                    const servico   = getVal(['servico', 'nome', 'ferramenta']) || 'Acesso';
-                    const usuario   = getVal(['usuario', 'login', 'user', 'email']) || '---';
-                    const senha     = getVal(['senha', 'password', 'pass']) || '';
-                    const link      = getVal(['link', 'url', 'site']) || '#';
-                    const categoria = getVal(['categoria', 'tipo', 'setor']) || 'Geral';
-                    
-                    // Limpeza de URL para o logo
-                    let rawLogo = getVal(['logo', 'dominio']) || '';
-                    let dominio = rawLogo.toString().toLowerCase()
-                        .replace(/^(https?:\/\/)?(www\.)?/, '')
-                        .split('/')[0]
-                        .trim();
+                    const servico   = getVal(['servico', 'nome']) || 'Acesso';
+                    const usuario   = getVal(['usuario', 'login', 'email']) || '---';
+                    const senha     = getVal(['senha', 'password']) || '';
+                    const link      = getVal(['link', 'url']) || '#';
+                    const categoria = getVal(['categoria', 'tipo']) || 'Geral';
+                    const rawLogo   = getVal(['logo', 'dominio']) || '';
 
+                    let dominio = rawLogo.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0].trim();
                     if(!dominio) dominio = `${servico.toLowerCase().replace(/\s+/g, '')}.com`;
 
                     const logoUrl = `https://img.logo.dev/${dominio}?token=${LOGO_TOKEN}`;
                     const fallbackUrl = `https://ui-avatars.com/api/?name=${servico}&background=1e293b&color=ef4444&bold=true`;
 
-                    grid.innerHTML += `
-                        <div class="vault-card p-6 flex flex-col md:flex-row items-center gap-6" data-search="${servico.toLowerCase()} ${usuario.toLowerCase()} ${categoria.toLowerCase()}">
-                            <div class="logo-vault shrink-0">
-                                <img src="${logoUrl}" alt="${servico}" class="max-w-full max-h-full object-contain" 
-                                     onerror="this.onerror=null; this.src='${fallbackUrl}';">
-                            </div>
-                            
-                            <div class="flex-1 w-full min-w-0">
-                                <div class="flex justify-between items-start mb-1">
-                                    <div>
-                                        <span class="badge-cat">${categoria}</span>
-                                        <h2 class="text-xl font-bold text-white truncate uppercase tracking-tight leading-none">${servico}</h2>
-                                    </div>
-                                    <a href="${link}" target="_blank" class="text-slate-600 hover:text-green-500 transition-colors mt-2">
-                                        <i class="fas fa-external-link-alt text-xs"></i>
-                                    </a>
+                    // CONSTRUÇÃO SEGURA DO CARD (Para suportar caracteres como < e >)
+                    const cardWrapper = document.createElement('div');
+                    cardWrapper.className = "vault-card p-6 flex flex-col md:flex-row items-center gap-6";
+                    cardWrapper.setAttribute('data-search', `${servico.toLowerCase()} ${usuario.toLowerCase()} ${categoria.toLowerCase()}`);
+
+                    cardWrapper.innerHTML = `
+                        <div class="logo-vault shrink-0 shadow-lg">
+                            <img src="${logoUrl}" alt="${servico}" class="max-w-full max-h-full object-contain" onerror="this.src='${fallbackUrl}'">
+                        </div>
+                        <div class="flex-1 w-full min-w-0 text-left">
+                            <div class="flex justify-between items-start mb-1">
+                                <div>
+                                    <span class="badge-cat">${categoria}</span>
+                                    <h2 class="text-xl font-bold text-white truncate uppercase tracking-tight leading-none">${servico}</h2>
                                 </div>
-                                <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-4">Login: <span class="text-slate-300 italic">${usuario}</span></p>
-                                
-                                <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800 shadow-inner">
-                                    <input type="password" value="${senha}" readonly id="pass-${index}" 
-                                           class="bg-transparent border-none text-sm text-red-500/80 font-mono w-full focus:outline-none pass-input">
-                                    
-                                    <div class="flex gap-1 border-l border-slate-800 pl-2">
-                                        <button onclick="toggleView(${index})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white" title="Visualizar">
-                                            <i class="fas fa-eye text-[10px]" id="icon-${index}"></i>
-                                        </button>
-                                        <button onclick="copyPass('pass-${index}')" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-blue-400" title="Copiar">
-                                            <i class="fas fa-copy text-[10px]"></i>
-                                        </button>
-                                    </div>
+                                <a href="${link}" target="_blank" class="text-slate-600 hover:text-green-500 transition-colors mt-2">
+                                    <i class="fas fa-external-link-alt text-xs"></i>
+                                </a>
+                            </div>
+                            <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-4">Login: <span class="text-slate-300 italic">${usuario}</span></p>
+                            <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                                <input type="password" readonly id="pass-${index}" 
+                                       class="bg-transparent border-none text-sm text-red-500/80 font-mono w-full focus:outline-none pass-input">
+                                <div class="flex gap-1 border-l border-slate-800 pl-2">
+                                    <button onclick="toggleView(${index})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white" title="Revelar">
+                                        <i class="fas fa-eye text-[10px]" id="icon-${index}"></i>
+                                    </button>
+                                    <button onclick="copyPass('pass-${index}')" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-blue-400" title="Copiar">
+                                        <i class="fas fa-copy text-[10px]"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>`;
+
+                    grid.appendChild(cardWrapper);
+                    
+                    // ATRIBUIÇÃO SEGURA DO VALOR DA SENHA
+                    // Isso evita que o navegador tente ler a senha como HTML
+                    document.getElementById(`pass-${index}`).value = senha;
                 });
 
                 document.getElementById('searchInput').addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase();
                     document.querySelectorAll('.vault-card').forEach(card => {
-                        const content = card.getAttribute('data-search');
-                        card.style.display = content.includes(term) ? 'flex' : 'none';
+                        card.style.display = card.getAttribute('data-search').includes(term) ? 'flex' : 'none';
                     });
                 });
             } catch (error) {
                 console.error(error);
-                document.getElementById('loader').innerHTML = '<p class="text-red-500 font-bold uppercase tracking-widest text-xs italic">Erro crítico de descriptografia.</p>';
+                document.getElementById('loader').innerHTML = '<p class="text-red-500 font-bold uppercase text-xs italic">Erro de conexão com o banco de dados.</p>';
             }
         }
 
         function toggleView(index) {
             const input = document.getElementById(`pass-${index}`);
             const icon = document.getElementById(`icon-${index}`);
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
-                input.type = "password";
-                icon.classList.replace("fa-eye-slash", "fa-eye");
-            }
+            input.type = input.type === "password" ? "text" : "password";
+            icon.classList.toggle("fa-eye");
+            icon.classList.toggle("fa-eye-slash");
         }
 
         function copyPass(id) {
             const input = document.getElementById(id);
             const originalType = input.type;
-            input.type = "text"; 
-            input.select();
-            document.execCommand("copy");
-            input.type = originalType;
             
+            // Lógica de cópia silenciosa
+            const tempInput = document.createElement("input");
+            tempInput.value = input.value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // Feedback Visual no botão
             const btn = window.event.currentTarget;
             const originalIcon = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check text-green-500 text-[10px]"></i>';
